@@ -1,0 +1,10 @@
+__pycache__
+.agents
+.clinerules
+.pytest_cache
+.ruff_cache
+.venv
+__init__.py
+logs
+swagger-cache
+AGENTS.md

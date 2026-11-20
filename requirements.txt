@@ -1,0 +1,8 @@
+pytest
+pytest-playwright
+playwright
+pytest-xdist
+ruff
+pydantic
+faker
+pydantic[email]
