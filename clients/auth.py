@@ -1,8 +1,13 @@
-from clients.public_builder import public_client_builder
 from httpx import URL, Response
 
 from clients.base import BaseAPIClient
-from schemas.auth import LoginRequestSchema, RegisterRequestSchema, RegisterResponseSchema, LoginResponseSchema
+from clients.public_builder import public_client_builder
+from schemas.auth import (
+    LoginRequestSchema,
+    LoginResponseSchema,
+    RegisterRequestSchema,
+    RegisterResponseSchema,
+)
 
 
 class AuthAPIClient(BaseAPIClient):

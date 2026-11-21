@@ -1,7 +1,8 @@
-from tools.data_generator import fake_en
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+from tools.data_generator import fake_en
 
 
 class RegisterRequestSchema(BaseModel):

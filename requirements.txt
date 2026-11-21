@@ -6,3 +6,4 @@ ruff
 pydantic
 faker
 pydantic[email]
+httpx

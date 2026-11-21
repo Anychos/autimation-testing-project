@@ -15,10 +15,10 @@ def private_client_builder(
         base_url="http://localhost:8000/api/v1",
         timeout=50,
         cookies=login_response.cookies,
-        headers={"Origin": "http://localhost:8000"}
+        headers={"Origin": "http://localhost:8000"},
     )
 
-    csrf_response = client.get("/api/v1/auth/csrf")
+    csrf_response = client.get("/auth/csrf")
     csrf_response.raise_for_status()
 
     csrf_token = csrf_response.json()["csrf_token"]

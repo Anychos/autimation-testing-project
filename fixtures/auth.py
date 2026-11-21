@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr
 import pytest
+from pydantic import BaseModel, EmailStr
 
 from clients.auth import AuthAPIClient, get_auth_client
 from schemas.auth import RegisterRequestSchema, RegisterResponseSchema
@@ -17,11 +17,13 @@ class UserFixture(BaseModel):
     def password(self) -> str:
         return self.request.password
 
-@pytest.fixture 
+
+@pytest.fixture
 def auth_client() -> AuthAPIClient:
     return get_auth_client()
 
-@pytest.fixture 
+
+@pytest.fixture
 def registered_user(auth_client: AuthAPIClient) -> UserFixture:
     register_request = RegisterRequestSchema()
     register_response = auth_client.register(body=register_request)

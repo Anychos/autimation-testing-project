@@ -1,5 +1,5 @@
-from pydantic import EmailStr
 from faker import Faker
+from pydantic import EmailStr
 
 
 class DataGenerator:
