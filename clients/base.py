@@ -7,6 +7,9 @@ class BaseAPIClient:
     def __init__(self, client: Client) -> None:
         self.client = client
 
+    def close(self) -> None:
+        self.client.close()
+
     def get(
         self,
         *,

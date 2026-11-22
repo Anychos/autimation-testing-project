@@ -1,0 +1,50 @@
+name: Smoke tests
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out tests
+        uses: actions/checkout@v4
+
+      - name: Check out application
+        id: application
+        uses: actions/checkout@v4
+        with:
+          repository: Anychos/autimation-testing-project-app
+          path: application
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install test dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Start application
+        working-directory: application
+        run: |
+          cp .env.example .env
+          docker compose -p smoke-ci up -d --build --wait --wait-timeout 120 backend
+
+      - name: Run smoke tests
+        run: python -m pytest -m smoke
+
+      - name: Show application logs on failure
+        if: failure() && steps.application.outcome == 'success'
+        working-directory: application
+        run: docker compose -p smoke-ci logs --no-color
+
+      - name: Stop application
+        if: always() && steps.application.outcome == 'success'
+        working-directory: application
+        run: docker compose -p smoke-ci down --volumes

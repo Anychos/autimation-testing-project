@@ -6,7 +6,11 @@ from assertions.auth import (
     assert_login_response,
     assert_register_response,
 )
-from assertions.base import assert_http_error_response, assert_status_code, assert_validation_error_response
+from assertions.base import (
+    assert_http_error_response,
+    assert_status_code,
+    assert_validation_error_response,
+)
 from clients.auth import AuthAPIClient
 from fixtures.auth import UserFixture
 from schemas.auth import (
@@ -14,7 +18,7 @@ from schemas.auth import (
     RegisterRequestSchema,
     RegisterResponseSchema,
 )
-from schemas.errors import BaseErrorSchema, HttpErrorSchema, ErrorDetailSchema
+from schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
 
 
 @pytest.mark.api
@@ -50,28 +54,63 @@ class TestAuth:
         "email, password, expected_details",
         [
             pytest.param(
-                "", "Validpass123!",
-                [ErrorDetailSchema(loc=["body", "email"], msg="Value error, Invalid email format", type="value_error")],
+                "",
+                "Validpass123!",
+                [
+                    ErrorDetailSchema(
+                        loc=["body", "email"],
+                        msg="Value error, Invalid email format",
+                        type="value_error",
+                    )
+                ],
                 id="empty-email",
             ),
             pytest.param(
-                "invalid-email", "Validpass123!",
-                [ErrorDetailSchema(loc=["body", "email"], msg="Value error, Invalid email format", type="value_error")],
+                "invalid-email",
+                "Validpass123!",
+                [
+                    ErrorDetailSchema(
+                        loc=["body", "email"],
+                        msg="Value error, Invalid email format",
+                        type="value_error",
+                    )
+                ],
                 id="invalid-email",
             ),
             pytest.param(
-                "check@example.com", "",
-                [ErrorDetailSchema(loc=["body", "password"], msg="String should have at least 8 characters", type="string_too_short")],
+                "check@example.com",
+                "",
+                [
+                    ErrorDetailSchema(
+                        loc=["body", "password"],
+                        msg="String should have at least 8 characters",
+                        type="string_too_short",
+                    )
+                ],
                 id="empty-password",
             ),
             pytest.param(
-                "check@example.com", "a" * 7,
-                [ErrorDetailSchema(loc=["body", "password"], msg="String should have at least 8 characters", type="string_too_short")],
+                "check@example.com",
+                "a" * 7,
+                [
+                    ErrorDetailSchema(
+                        loc=["body", "password"],
+                        msg="String should have at least 8 characters",
+                        type="string_too_short",
+                    )
+                ],
                 id="password-min-minus-one",
             ),
             pytest.param(
-                "check@example.com", "a" * 65,
-                [ErrorDetailSchema(loc=["body", "password"], msg="String should have at most 64 characters", type="string_too_long")],
+                "check@example.com",
+                "a" * 65,
+                [
+                    ErrorDetailSchema(
+                        loc=["body", "password"],
+                        msg="String should have at most 64 characters",
+                        type="string_too_long",
+                    )
+                ],
                 id="password-max-plus-one",
             ),
         ],
@@ -94,7 +133,8 @@ class TestAuth:
 
         # Assert
         assert_status_code(
-            expected=HTTPStatus.UNPROCESSABLE_ENTITY, actual=register_response.status_code
+            expected=HTTPStatus.UNPROCESSABLE_ENTITY,
+            actual=register_response.status_code,
         )
         response_data = HttpErrorSchema.model_validate_json(register_response.content)
         assert_validation_error_response(response_data, expected_details)
@@ -138,8 +178,7 @@ class TestAuth:
         assert_http_error_response(response_data, expected_error)
 
     def test_login_existing_user_incorrect_password_returns_401(
-        self, auth_client: AuthAPIClient,
-        registered_user: UserFixture
+        self, auth_client: AuthAPIClient, registered_user: UserFixture
     ) -> None:
         expected_error = HttpErrorSchema(
             error=BaseErrorSchema(
@@ -148,9 +187,7 @@ class TestAuth:
                 details=[],
             )
         )
-        login_request = RegisterRequestSchema(
-            email=registered_user.email
-        )
+        login_request = RegisterRequestSchema(email=registered_user.email)
         login_response = auth_client.login_api(body=login_request)
         assert_status_code(
             expected=HTTPStatus.UNAUTHORIZED, actual=login_response.status_code

@@ -16,6 +16,13 @@
 - **Faker** — генерация тестовых данных.
 - **Ruff** — проверка качества кода.
 
+## Smoke-тесты в GitHub Actions
+
+При каждом push workflow запускает тесты с маркировкой `smoke`. Он получает
+[репозиторий приложения](https://github.com/Anychos/autimation-testing-project-app),
+поднимает backend и PostgreSQL через Docker Compose и запускает `python -m pytest -m smoke`.
+Результат и логи доступны во вкладке Actions репозитория тестов.
+
 ## Структура проекта
 
 ```text

@@ -1,8 +1,14 @@
+from collections.abc import Iterator
+
 import pytest
 from pydantic import BaseModel, EmailStr
 
 from clients.auth import AuthAPIClient, get_auth_client
-from schemas.auth import RegisterRequestSchema, RegisterResponseSchema
+from schemas.auth import (
+    LoginRequestSchema,
+    RegisterRequestSchema,
+    RegisterResponseSchema,
+)
 
 
 class UserFixture(BaseModel):
@@ -17,10 +23,20 @@ class UserFixture(BaseModel):
     def password(self) -> str:
         return self.request.password
 
+    @property
+    def login_data(self) -> LoginRequestSchema:
+        return LoginRequestSchema(
+            email=self.request.email, password=self.request.password
+        )
+
 
 @pytest.fixture
-def auth_client() -> AuthAPIClient:
-    return get_auth_client()
+def auth_client() -> Iterator[AuthAPIClient]:
+    client = get_auth_client()
+    try:
+        yield client
+    finally:
+        client.close()
 
 
 @pytest.fixture

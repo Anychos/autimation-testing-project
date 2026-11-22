@@ -3,7 +3,9 @@ pytest-playwright
 playwright
 pytest-xdist
 ruff
+pre-commit
 pydantic
 faker
 pydantic[email]
 httpx
+pydantic_settings

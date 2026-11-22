@@ -8,11 +8,12 @@ from schemas.auth import (
     RegisterRequestSchema,
     RegisterResponseSchema,
 )
+from tools.routes import Route
 
 
 class AuthAPIClient(BaseAPIClient):
     def register_api(self, *, body: RegisterRequestSchema) -> Response:
-        return self.post(url="/auth/register", json=body.model_dump(mode="json"))
+        return self.post(url=Route.REGISTER, json=body.model_dump(mode="json"))
 
     def register(self, *, body: RegisterRequestSchema) -> RegisterResponseSchema:
         response = self.register_api(body=body)
@@ -21,7 +22,7 @@ class AuthAPIClient(BaseAPIClient):
         return response_data
 
     def login_api(self, *, body: LoginRequestSchema) -> Response:
-        return self.post(url="/auth/login", json=body.model_dump(mode="json"))
+        return self.post(url=Route.LOGIN, json=body.model_dump(mode="json"))
 
     def login(self, *, url: URL, body: LoginRequestSchema) -> LoginResponseSchema:
         response = self.login_api(body=body)

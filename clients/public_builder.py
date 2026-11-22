@@ -1,9 +1,11 @@
 from httpx import Client
 
+from config import settings
+
 
 def public_client_builder() -> Client:
     return Client(
-        base_url="http://localhost:8000/api/v1",
-        timeout=50,
-        headers={"Origin": "http://localhost:8000"},
+        base_url=settings.http_client.url,
+        timeout=settings.http_client.timeout,
+        headers={"Origin": settings.http_client.url.rstrip("/")},
     )
