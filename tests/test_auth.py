@@ -3,8 +3,8 @@ from http import HTTPStatus
 import pytest
 
 from assertions.auth import (
-    assert_login_response,
     assert_register_response,
+    assert_user_response,
 )
 from assertions.base import (
     assert_http_error_response,
@@ -17,12 +17,14 @@ from schemas.auth import (
     LoginResponseSchema,
     RegisterRequestSchema,
     RegisterResponseSchema,
+    UserResponseSchema,
 )
 from schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
 
 
 @pytest.mark.api
 @pytest.mark.auth
+@pytest.mark.regression
 class TestAuth:
     @pytest.mark.smoke
     def test_registration_new_user_returns_201(
@@ -42,13 +44,21 @@ class TestAuth:
     def test_login_existing_user_returns_200(
         self, auth_client: AuthAPIClient, registered_user: UserFixture
     ) -> None:
-        login_request = RegisterRequestSchema(
-            email=registered_user.email, password=registered_user.password
-        )
+        # Arrange
+        login_request = registered_user.login_data
+
+        # Act
         login_response = auth_client.login_api(body=login_request)
+
+        # Assert
         assert_status_code(expected=HTTPStatus.OK, actual=login_response.status_code)
         response_data = LoginResponseSchema.model_validate_json(login_response.content)
-        assert_login_response(login_request, response_data)
+        assert_user_response(registered_user.response, response_data)
+
+        me_response = auth_client.get_user_me_api()
+        assert_status_code(expected=HTTPStatus.OK, actual=me_response.status_code)
+        current_user = UserResponseSchema.model_validate_json(me_response.content)
+        assert_user_response(registered_user.response, current_user)
 
     @pytest.mark.parametrize(
         "email, password, expected_details",

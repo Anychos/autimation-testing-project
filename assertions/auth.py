@@ -1,9 +1,8 @@
 from assertions.base import assert_field_value
 from schemas.auth import (
-    LoginRequestSchema,
-    LoginResponseSchema,
     RegisterRequestSchema,
     RegisterResponseSchema,
+    UserResponseSchema,
 )
 
 
@@ -13,7 +12,8 @@ def assert_register_response(
     assert_field_value(register_request.email, register_response.email, "email")
 
 
-def assert_login_response(
-    login_request: LoginRequestSchema, login_response: LoginResponseSchema
+def assert_user_response(
+    expected: UserResponseSchema, actual: UserResponseSchema
 ) -> None:
-    assert_field_value(login_request.email, login_response.email, "email")
+    assert_field_value(expected.id, actual.id, "id")
+    assert_field_value(expected.email, actual.email, "email")

@@ -40,8 +40,6 @@ jobs:
         env:
           HTTP_CLIENT.BASE_URL: http://localhost:8000
           HTTP_CLIENT.TIMEOUT: '10'
-          TEST_USER.EMAIL: ci@example.com
-          TEST_USER.PASSWORD: ci-test-password
         run: python -m pytest -m smoke
 
       - name: Show application logs on failure

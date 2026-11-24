@@ -4,14 +4,16 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from tools.data_generator import fake_en
+
 
 class BaseTaskSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     title: str = Field(min_length=3, max_length=100)
-    description: str = Field(default="", max_length=500)
-    status: Literal["todo", "in_progress", "done"] = Field(default="todo")
-    due_date: date | None = None
+    description: str = Field(max_length=500)
+    status: Literal["todo", "in_progress", "done"]
+    due_date: date | None
     id: UUID
     owner_id: UUID
     created_at: datetime
@@ -21,7 +23,7 @@ class BaseTaskSchema(BaseModel):
 class CreateTaskRequestSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    title: str = Field(min_length=3, max_length=100)
+    title: str = Field(min_length=3, max_length=100, default_factory=fake_en.task_title)
     description: str = Field(default="", max_length=500)
     status: Literal["todo", "in_progress", "done"] = Field(default="todo")
     due_date: date | None = None

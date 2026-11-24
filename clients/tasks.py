@@ -8,6 +8,7 @@ from clients.private_builder import private_client_builder
 from schemas.auth import LoginRequestSchema
 from schemas.tasks import (
     CreateTaskRequestSchema,
+    CreateTaskResponseSchema,
     GetTasksQueryParamsSchema,
     PatchTaskRequestSchema,
 )
@@ -17,6 +18,12 @@ from tools.routes import Route
 class TasksAPIClient(BaseAPIClient):
     def create_task_api(self, body: CreateTaskRequestSchema) -> Response:
         return self.post(url=Route.TASKS, json=body.model_dump(mode="json"))
+
+    def create_task(self, body: CreateTaskRequestSchema) -> CreateTaskResponseSchema:
+        response = self.create_task_api(body)
+        response.raise_for_status()
+        response_data = CreateTaskResponseSchema.model_validate_json(response.content)
+        return response_data
 
     def get_tasks_list_api(
         self, params: GetTasksQueryParamsSchema | None = None

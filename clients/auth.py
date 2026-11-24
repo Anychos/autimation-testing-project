@@ -1,4 +1,4 @@
-from httpx import URL, Response
+from httpx import Response
 
 from clients.base import BaseAPIClient
 from clients.public_builder import public_client_builder
@@ -24,11 +24,14 @@ class AuthAPIClient(BaseAPIClient):
     def login_api(self, *, body: LoginRequestSchema) -> Response:
         return self.post(url=Route.LOGIN, json=body.model_dump(mode="json"))
 
-    def login(self, *, url: URL, body: LoginRequestSchema) -> LoginResponseSchema:
+    def login(self, *, body: LoginRequestSchema) -> LoginResponseSchema:
         response = self.login_api(body=body)
         response.raise_for_status()
         response_data = LoginResponseSchema.model_validate_json(response.content)
         return response_data
+
+    def get_user_me_api(self) -> Response:
+        return self.get(url=Route.GET_USER_ME)
 
 
 def get_auth_client() -> AuthAPIClient:

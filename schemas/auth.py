@@ -12,9 +12,13 @@ class RegisterRequestSchema(BaseModel):
     password: str = Field(min_length=8, max_length=64, default_factory=fake_en.password)
 
 
-class RegisterResponseSchema(BaseModel):
+class UserResponseSchema(BaseModel):
     id: UUID
     email: EmailStr
+
+
+class RegisterResponseSchema(UserResponseSchema):
+    pass
 
 
 class LoginRequestSchema(BaseModel):
@@ -24,6 +28,5 @@ class LoginRequestSchema(BaseModel):
     password: str = Field(min_length=8, max_length=64)
 
 
-class LoginResponseSchema(BaseModel):
-    id: UUID
-    email: EmailStr
+class LoginResponseSchema(UserResponseSchema):
+    pass

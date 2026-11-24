@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from uuid import UUID
 
 import pytest
 from pydantic import BaseModel, EmailStr
@@ -28,6 +29,10 @@ class UserFixture(BaseModel):
         return LoginRequestSchema(
             email=self.request.email, password=self.request.password
         )
+
+    @property
+    def user_id(self) -> UUID:
+        return self.response.id
 
 
 @pytest.fixture

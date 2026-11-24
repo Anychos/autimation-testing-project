@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, HttpUrl
+from pydantic import BaseModel, HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,11 +11,6 @@ class HttpClientSettings(BaseModel):
         return str(self.base_url)
 
 
-class TestUserData(BaseModel):
-    email: EmailStr
-    password: str
-
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -24,7 +19,6 @@ class Settings(BaseSettings):
         extra="ignore",
     )
     http_client: HttpClientSettings
-    test_user: TestUserData
 
 
 settings = Settings()
