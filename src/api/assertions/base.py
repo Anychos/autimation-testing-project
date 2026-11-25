@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Any
 
-from schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
+from src.api.schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
 
 
 def assert_status_code(expected: HTTPStatus, actual: int) -> None:

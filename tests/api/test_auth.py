@@ -2,24 +2,24 @@ from http import HTTPStatus
 
 import pytest
 
-from assertions.auth import (
+from src.api.assertions.auth import (
     assert_register_response,
     assert_user_response,
 )
-from assertions.base import (
+from src.api.assertions.base import (
     assert_http_error_response,
     assert_status_code,
     assert_validation_error_response,
 )
-from clients.auth import AuthAPIClient
-from fixtures.auth import UserFixture
-from schemas.auth import (
+from src.api.clients.auth import AuthAPIClient
+from src.api.fixtures.auth import UserFixture
+from src.api.schemas.auth import (
     LoginResponseSchema,
     RegisterRequestSchema,
     RegisterResponseSchema,
     UserResponseSchema,
 )
-from schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
+from src.api.schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
 
 
 @pytest.mark.api

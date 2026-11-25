@@ -1,6 +1,6 @@
 from httpx import Client
 
-from config import settings
+from src.api.config import settings
 
 
 def public_client_builder() -> Client:

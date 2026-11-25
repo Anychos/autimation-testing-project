@@ -1,5 +1,5 @@
-from assertions.base import assert_field_value
-from schemas.auth import (
+from src.api.assertions.base import assert_field_value
+from src.api.schemas.auth import (
     RegisterRequestSchema,
     RegisterResponseSchema,
     UserResponseSchema,

@@ -54,8 +54,8 @@ Copy-Item .env.example .env
 .\.venv\Scripts\python.exe -m pytest -m regression
 
 # Отдельные модули
-.\.venv\Scripts\python.exe -m pytest tests/test_auth.py
-.\.venv\Scripts\python.exe -m pytest tests/test_tasks.py
+.\.venv\Scripts\python.exe -m pytest tests/api/test_auth.py
+.\.venv\Scripts\python.exe -m pytest tests/api/test_tasks.py
 ```
 
 Тесты и фикстуры регистрируют пользователей. Созданные через фикстуры задачи и задачи, ID которых зарегистрирован для очистки, удаляются после тестов; если тест уже удалил задачу, очистка учитывает ответ `TASK_NOT_FOUND`. Пользователи автоматически не удаляются, поэтому используйте тестовое окружение.
@@ -68,14 +68,15 @@ Copy-Item .env.example .env
 
 ```text
 .github/workflows/  Запуск smoke-тестов в GitHub Actions
-assertions/         Переиспользуемые проверки ответов
-clients/            API-клиенты и создание HTTP-клиентов
-fixtures/           Подготовка пользователей, клиентов и задач, очистка задач
-schemas/            Pydantic-схемы запросов и ответов
-tests/              Тесты авторизации и задач
-tools/              Маршруты API и генерация данных
+src/api/assertions/ Переиспользуемые проверки ответов API
+src/api/clients/    API-клиенты и создание HTTP-клиентов
+src/api/fixtures/   Подготовка пользователей, клиентов и задач, очистка задач
+src/api/schemas/    Pydantic-схемы запросов и ответов
+src/api/tools/      Маршруты API и генерация данных
+src/api/config.py   Загрузка настроек API
+src/ui/             Страницы и компоненты пользовательского интерфейса
+tests/api/          API-тесты авторизации и задач
 .env.example        Пример настроек тестового проекта
-config.py           Загрузка настроек
 conftest.py         Подключение общих фикстур pytest
 pytest.ini          Настройки и маркеры pytest
 requirements.txt    Зависимости проекта

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from tools.data_generator import fake_en
+from src.api.tools.data_generator import fake_en
 
 
 class BaseTaskSchema(BaseModel):

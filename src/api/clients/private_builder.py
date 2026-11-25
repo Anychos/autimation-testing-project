@@ -1,9 +1,9 @@
 from httpx import Client
 
-from clients.auth import AuthAPIClient
-from config import settings
-from schemas.auth import LoginRequestSchema
-from tools.routes import Route
+from src.api.clients.auth import AuthAPIClient
+from src.api.config import settings
+from src.api.schemas.auth import LoginRequestSchema
+from src.api.tools.routes import Route
 
 
 def private_client_builder(

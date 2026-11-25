@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from assertions.base import assert_field_value
-from schemas.tasks import (
+from src.api.assertions.base import assert_field_value
+from src.api.schemas.tasks import (
     BaseTaskSchema,
     CreateTaskRequestSchema,
     CreateTaskResponseSchema,

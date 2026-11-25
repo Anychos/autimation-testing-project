@@ -1,14 +1,14 @@
 from httpx import Response
 
-from clients.base import BaseAPIClient
-from clients.public_builder import public_client_builder
-from schemas.auth import (
+from src.api.clients.base import BaseAPIClient
+from src.api.clients.public_builder import public_client_builder
+from src.api.schemas.auth import (
     LoginRequestSchema,
     LoginResponseSchema,
     RegisterRequestSchema,
     RegisterResponseSchema,
 )
-from tools.routes import Route
+from src.api.tools.routes import Route
 
 
 class AuthAPIClient(BaseAPIClient):

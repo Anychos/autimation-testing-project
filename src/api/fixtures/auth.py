@@ -4,8 +4,8 @@ from uuid import UUID
 import pytest
 from pydantic import BaseModel, EmailStr
 
-from clients.auth import AuthAPIClient, get_auth_client
-from schemas.auth import (
+from src.api.clients.auth import AuthAPIClient, get_auth_client
+from src.api.schemas.auth import (
     LoginRequestSchema,
     RegisterRequestSchema,
     RegisterResponseSchema,

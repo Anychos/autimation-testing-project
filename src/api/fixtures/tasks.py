@@ -6,13 +6,13 @@ from uuid import UUID
 import pytest
 from pydantic import BaseModel
 
-from assertions.base import assert_field_value, assert_status_code
-from clients.auth import AuthAPIClient
-from clients.tasks import TasksAPIClient, get_tasks_client
-from fixtures.auth import UserFixture
-from schemas.auth import LoginRequestSchema, RegisterRequestSchema
-from schemas.errors import HttpErrorSchema
-from schemas.tasks import CreateTaskRequestSchema, CreateTaskResponseSchema
+from src.api.assertions.base import assert_field_value, assert_status_code
+from src.api.clients.auth import AuthAPIClient
+from src.api.clients.tasks import TasksAPIClient, get_tasks_client
+from src.api.fixtures.auth import UserFixture
+from src.api.schemas.auth import LoginRequestSchema, RegisterRequestSchema
+from src.api.schemas.errors import HttpErrorSchema
+from src.api.schemas.tasks import CreateTaskRequestSchema, CreateTaskResponseSchema
 
 
 class TaskFixture(BaseModel):

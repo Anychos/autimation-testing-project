@@ -13,7 +13,7 @@ class BaseAPIClient:
     def get(
         self,
         *,
-        url: URL,
+        url: URL | str,
         params: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
     ) -> Response:
@@ -22,7 +22,7 @@ class BaseAPIClient:
     def post(
         self,
         *,
-        url: URL,
+        url: URL | str,
         headers: dict[str, str] | None = None,
         json: Any | None = None,
     ) -> Response:
@@ -31,7 +31,7 @@ class BaseAPIClient:
     def patch(
         self,
         *,
-        url: URL,
+        url: URL | str,
         headers: dict[str, str] | None = None,
         json: Any | None = None,
     ) -> Response:
@@ -40,7 +40,7 @@ class BaseAPIClient:
     def delete(
         self,
         *,
-        url: URL,
+        url: URL | str,
         params: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
     ) -> Response:

@@ -2,17 +2,17 @@ from uuid import UUID
 
 from httpx import Response
 
-from clients.auth import AuthAPIClient
-from clients.base import BaseAPIClient
-from clients.private_builder import private_client_builder
-from schemas.auth import LoginRequestSchema
-from schemas.tasks import (
+from src.api.clients.auth import AuthAPIClient
+from src.api.clients.base import BaseAPIClient
+from src.api.clients.private_builder import private_client_builder
+from src.api.schemas.auth import LoginRequestSchema
+from src.api.schemas.tasks import (
     CreateTaskRequestSchema,
     CreateTaskResponseSchema,
     GetTasksQueryParamsSchema,
     PatchTaskRequestSchema,
 )
-from tools.routes import Route
+from src.api.tools.routes import Route
 
 
 class TasksAPIClient(BaseAPIClient):

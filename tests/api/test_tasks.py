@@ -4,22 +4,22 @@ from uuid import UUID
 
 import pytest
 
-from assertions.base import (
+from src.api.assertions.base import (
     assert_http_error_response,
     assert_status_code,
     assert_validation_error_response,
 )
-from assertions.tasks import (
+from src.api.assertions.tasks import (
     assert_create_task_response,
     assert_get_task_response,
     assert_get_tasks_response,
     assert_patch_task_response,
 )
-from clients.tasks import TasksAPIClient
-from fixtures.auth import UserFixture
-from fixtures.tasks import TaskFixture
-from schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
-from schemas.tasks import (
+from src.api.clients.tasks import TasksAPIClient
+from src.api.fixtures.auth import UserFixture
+from src.api.fixtures.tasks import TaskFixture
+from src.api.schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
+from src.api.schemas.tasks import (
     CreateTaskRequestSchema,
     CreateTaskResponseSchema,
     GetTaskResponseSchema,
