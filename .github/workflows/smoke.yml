@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy_retry.outputs.page_url }}
     steps:
       - name: Check out tests
         uses: actions/checkout@v4
@@ -47,12 +47,12 @@ jobs:
           cp .env.example .env
           docker compose -p smoke-ci up -d --build --wait --wait-timeout 120 backend
 
-      - name: Run smoke tests
+      - name: Run tests
         id: tests
         env:
           HTTP_CLIENT.BASE_URL: http://localhost:8000
           HTTP_CLIENT.TIMEOUT: '10'
-        run: python -m pytest -m smoke
+        run: python -m pytest
 
       - name: Check for Allure results
         id: results
@@ -100,7 +100,7 @@ jobs:
           if [ -d gh-pages/last-history ]; then
             cp -a gh-pages/last-history allure-results/history
           fi
-          python -c 'import json, os; e = os.environ; base = e["REPORT_BASE_URL"].rstrip("/"); json.dump({"name": "GitHub Actions", "type": "github", "reportName": "Smoke tests", "buildOrder": int(e["GITHUB_RUN_NUMBER"]), "buildName": "Run #" + e["GITHUB_RUN_NUMBER"], "buildUrl": e["GITHUB_SERVER_URL"] + "/" + e["GITHUB_REPOSITORY"] + "/actions/runs/" + e["GITHUB_RUN_ID"], "reportUrl": base + "/" + e["GITHUB_RUN_NUMBER"] + "/"}, open("allure-results/executor.json", "w", encoding="utf-8"))'
+          python -c 'import json, os; e = os.environ; base = e["REPORT_BASE_URL"].rstrip("/"); json.dump({"name": "GitHub Actions", "type": "github", "reportName": "Tests", "buildOrder": int(e["GITHUB_RUN_NUMBER"]), "buildName": "Run #" + e["GITHUB_RUN_NUMBER"], "buildUrl": e["GITHUB_SERVER_URL"] + "/" + e["GITHUB_REPOSITORY"] + "/actions/runs/" + e["GITHUB_RUN_ID"], "reportUrl": base + "/" + e["GITHUB_RUN_NUMBER"] + "/"}, open("allure-results/executor.json", "w", encoding="utf-8"))'
           "$RUNNER_TEMP/allure-2.42.0/bin/allure" generate allure-results --clean -o allure-report
           rm -rf "allure-history/$GITHUB_RUN_NUMBER" allure-history/last-history
           cp -a allure-report "allure-history/$GITHUB_RUN_NUMBER"
@@ -135,12 +135,22 @@ jobs:
       - name: Deploy report to GitHub Pages
         if: always() && steps.upload.outcome == 'success'
         id: deploy
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Wait before retrying deployment
+        if: always() && steps.deploy.outcome == 'failure'
+        run: sleep 15
+
+      - name: Retry report deployment
+        if: always() && steps.deploy.outcome == 'failure'
+        id: deploy_retry
         uses: actions/deploy-pages@v4
 
       - name: Add report link to summary
-        if: always() && steps.deploy.outcome == 'success'
+        if: always() && (steps.deploy.outcome == 'success' || steps.deploy_retry.outcome == 'success')
         env:
-          PAGE_URL: ${{ steps.deploy.outputs.page_url }}
+          PAGE_URL: ${{ steps.deploy.outputs.page_url || steps.deploy_retry.outputs.page_url }}
         run: |
           echo "[Allure report #${GITHUB_RUN_NUMBER}](${PAGE_URL}${GITHUB_RUN_NUMBER}/)" >> "$GITHUB_STEP_SUMMARY"
 
