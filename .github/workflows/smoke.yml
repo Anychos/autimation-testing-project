@@ -89,12 +89,25 @@ jobs:
       - name: Generate Allure report
         if: always() && steps.history_branch.outcome == 'success' && (steps.history_branch.outputs.exists != 'true' || steps.clean_history.outcome == 'success')
         id: report
-        uses: simple-elf/allure-report-action@v1.14
-        with:
-          gh_pages: gh-pages
-          allure_results: allure-results
-          allure_history: allure-history
-          keep_reports: 5
+        env:
+          REPORT_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: |
+          curl -fsSL https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.42.0/allure-commandline-2.42.0.tgz | tar -xz -C "$RUNNER_TEMP"
+          mkdir -p allure-history
+          if [ -d gh-pages ]; then
+            cp -a gh-pages/. allure-history/
+          fi
+          if [ -d gh-pages/last-history ]; then
+            cp -a gh-pages/last-history allure-results/history
+          fi
+          python -c 'import json, os; e = os.environ; base = e["REPORT_BASE_URL"].rstrip("/"); json.dump({"name": "GitHub Actions", "type": "github", "reportName": "Smoke tests", "buildOrder": int(e["GITHUB_RUN_NUMBER"]), "buildName": "Run #" + e["GITHUB_RUN_NUMBER"], "buildUrl": e["GITHUB_SERVER_URL"] + "/" + e["GITHUB_REPOSITORY"] + "/actions/runs/" + e["GITHUB_RUN_ID"], "reportUrl": base + "/" + e["GITHUB_RUN_NUMBER"] + "/"}, open("allure-results/executor.json", "w", encoding="utf-8"))'
+          "$RUNNER_TEMP/allure-2.42.0/bin/allure" generate allure-results --clean -o allure-report
+          rm -rf "allure-history/$GITHUB_RUN_NUMBER" allure-history/last-history
+          cp -a allure-report "allure-history/$GITHUB_RUN_NUMBER"
+          cp -a allure-report/history allure-history/last-history
+          find allure-history -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | grep -E '^[0-9]+$' | sort -rn | tail -n +6 | while read -r old_report; do
+            rm -rf "allure-history/$old_report"
+          done
 
       - name: Set latest report as the home page
         if: always() && steps.report.outcome == 'success'
