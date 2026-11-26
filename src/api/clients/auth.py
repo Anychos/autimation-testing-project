@@ -1,3 +1,4 @@
+import allure
 from httpx import Response
 
 from src.api.clients.base import BaseAPIClient
@@ -12,6 +13,7 @@ from src.api.tools.routes import Route
 
 
 class AuthAPIClient(BaseAPIClient):
+    @allure.step("Отправка запроса на регистрацию")
     def register_api(self, *, body: RegisterRequestSchema) -> Response:
         return self.post(url=Route.REGISTER, json=body.model_dump(mode="json"))
 
@@ -21,6 +23,7 @@ class AuthAPIClient(BaseAPIClient):
         response_data = RegisterResponseSchema.model_validate_json(response.content)
         return response_data
 
+    @allure.step("Отправка запроса на логин")
     def login_api(self, *, body: LoginRequestSchema) -> Response:
         return self.post(url=Route.LOGIN, json=body.model_dump(mode="json"))
 
@@ -30,6 +33,7 @@ class AuthAPIClient(BaseAPIClient):
         response_data = LoginResponseSchema.model_validate_json(response.content)
         return response_data
 
+    @allure.step("Отправка запроса на получение данных текущего пользователя")
     def get_user_me_api(self) -> Response:
         return self.get(url=Route.GET_USER_ME)
 

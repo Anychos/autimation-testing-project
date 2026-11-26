@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+import allure
 import pytest
 
 from src.api.assertions.auth import (
@@ -20,13 +21,19 @@ from src.api.schemas.auth import (
     UserResponseSchema,
 )
 from src.api.schemas.errors import BaseErrorSchema, ErrorDetailSchema, HttpErrorSchema
+from tools.allure import Epic, Feature, Severity, Story
 
 
 @pytest.mark.api
 @pytest.mark.auth
 @pytest.mark.regression
+@allure.epic(Epic.API)
+@allure.feature(Feature.AUTHORIZATION)
 class TestAuth:
     @pytest.mark.smoke
+    @allure.story(Story.REGISTRATION)
+    @allure.title("Регистрация пользователя")
+    @allure.severity(Severity.CRITICAL)
     def test_registration_new_user_returns_201(
         self, auth_client: AuthAPIClient
     ) -> None:
@@ -41,16 +48,16 @@ class TestAuth:
         assert_register_response(register_request, response_data)
 
     @pytest.mark.smoke
+    @allure.story(Story.LOGIN)
+    @allure.title("Логин пользователя")
+    @allure.severity(Severity.CRITICAL)
     def test_login_existing_user_returns_200(
         self, auth_client: AuthAPIClient, registered_user: UserFixture
     ) -> None:
-        # Arrange
         login_request = registered_user.login_data
 
-        # Act
         login_response = auth_client.login_api(body=login_request)
 
-        # Assert
         assert_status_code(expected=HTTPStatus.OK, actual=login_response.status_code)
         response_data = LoginResponseSchema.model_validate_json(login_response.content)
         assert_user_response(registered_user.response, response_data)
@@ -125,6 +132,9 @@ class TestAuth:
             ),
         ],
     )
+    @allure.story(Story.REGISTRATION)
+    @allure.title("Регистрация пользователя с некорректными данными")
+    @allure.severity(Severity.MAJOR)
     def test_registration_incorrect_data_returns_422(
         self,
         auth_client: AuthAPIClient,
@@ -132,16 +142,13 @@ class TestAuth:
         password: str,
         expected_details: list[ErrorDetailSchema],
     ) -> None:
-        # Arrange
         register_request = RegisterRequestSchema.model_construct(
             email=email,
             password=password,
         )
 
-        # Act
         register_response = auth_client.register_api(body=register_request)
 
-        # Assert
         assert_status_code(
             expected=HTTPStatus.UNPROCESSABLE_ENTITY,
             actual=register_response.status_code,
@@ -149,6 +156,9 @@ class TestAuth:
         response_data = HttpErrorSchema.model_validate_json(register_response.content)
         assert_validation_error_response(response_data, expected_details)
 
+    @allure.story(Story.REGISTRATION)
+    @allure.title("Регистрация пользователя с зарегистрированным email")
+    @allure.severity(Severity.MAJOR)
     def test_registration_with_existing_email_returns_409(
         self, auth_client: AuthAPIClient, registered_user: UserFixture
     ) -> None:
@@ -169,6 +179,9 @@ class TestAuth:
         response_data = HttpErrorSchema.model_validate_json(register_response.content)
         assert_http_error_response(response_data, expected_error)
 
+    @allure.story(Story.LOGIN)
+    @allure.title("Логин несуществующего пользователя")
+    @allure.severity(Severity.MEDIUM)
     def test_login_nonexistent_user_returns_401(
         self, auth_client: AuthAPIClient
     ) -> None:
@@ -187,6 +200,9 @@ class TestAuth:
         response_data = HttpErrorSchema.model_validate_json(login_response.content)
         assert_http_error_response(response_data, expected_error)
 
+    @allure.story(Story.LOGIN)
+    @allure.title("Логин пользователя с некорректным паролем")
+    @allure.severity(Severity.MAJOR)
     def test_login_existing_user_incorrect_password_returns_401(
         self, auth_client: AuthAPIClient, registered_user: UserFixture
     ) -> None:

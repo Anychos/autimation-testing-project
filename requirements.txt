@@ -9,3 +9,4 @@ faker
 pydantic[email]
 httpx
 pydantic_settings
+allure-pytest

@@ -2,14 +2,25 @@ name: Smoke tests
 
 on:
   push:
+    branches-ignore:
+      - gh-pages
+
+concurrency:
+  group: smoke-allure-pages
+  cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Check out tests
         uses: actions/checkout@v4
@@ -37,10 +48,87 @@ jobs:
           docker compose -p smoke-ci up -d --build --wait --wait-timeout 120 backend
 
       - name: Run smoke tests
+        id: tests
         env:
           HTTP_CLIENT.BASE_URL: http://localhost:8000
           HTTP_CLIENT.TIMEOUT: '10'
         run: python -m pytest -m smoke
+
+      - name: Check for Allure results
+        id: results
+        if: always() && steps.tests.outcome != 'skipped'
+        run: |
+          if find allure-results -maxdepth 1 -name '*-result.json' -print -quit 2>/dev/null | grep -q .; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check whether report history exists
+        if: always() && steps.results.outputs.available == 'true'
+        id: history_branch
+        run: |
+          git ls-remote --exit-code --heads origin gh-pages > /dev/null && status=0 || status=$?
+          if [ "$status" -eq 0 ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          elif [ "$status" -ne 2 ]; then
+            exit "$status"
+          fi
+
+      - name: Check out report history
+        if: always() && steps.history_branch.outcome == 'success' && steps.history_branch.outputs.exists == 'true'
+        id: checkout_history
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Remove Git metadata from report history
+        if: always() && steps.checkout_history.outcome == 'success'
+        id: clean_history
+        run: rm -rf gh-pages/.git
+
+      - name: Generate Allure report
+        if: always() && steps.history_branch.outcome == 'success' && (steps.history_branch.outputs.exists != 'true' || steps.clean_history.outcome == 'success')
+        id: report
+        uses: simple-elf/allure-report-action@v1.14
+        with:
+          gh_pages: gh-pages
+          allure_results: allure-results
+          allure_history: allure-history
+          keep_reports: 5
+
+      - name: Set latest report as the home page
+        if: always() && steps.report.outcome == 'success'
+        id: homepage
+        run: |
+          printf '<!doctype html><meta http-equiv="refresh" content="0; url=%s/">\n<a href="%s/">Latest Allure report</a>\n' "$GITHUB_RUN_NUMBER" "$GITHUB_RUN_NUMBER" > allure-history/index.html
+
+      - name: Save report history
+        if: always() && steps.homepage.outcome == 'success'
+        id: history
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          force_orphan: true
+
+      - name: Upload Pages artifact
+        if: always() && steps.history.outcome == 'success'
+        id: upload
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-history
+
+      - name: Deploy report to GitHub Pages
+        if: always() && steps.upload.outcome == 'success'
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: Add report link to summary
+        if: always() && steps.deploy.outcome == 'success'
+        env:
+          PAGE_URL: ${{ steps.deploy.outputs.page_url }}
+        run: echo "[Allure report #${GITHUB_RUN_NUMBER}](${PAGE_URL}${GITHUB_RUN_NUMBER}/)" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Show application logs on failure
         if: failure() && steps.application.outcome == 'success'

@@ -42,17 +42,14 @@ class TestTasks:
         registered_user: UserFixture,
         task_ids_to_cleanup: list[UUID],
     ) -> None:
-        # Arrange
         body = CreateTaskRequestSchema(
             description="Review the test results",
             status="in_progress",
             due_date=date(2030, 6, 20),
         )
 
-        # Act
         response = tasks_client.create_task_api(body=body)
 
-        # Assert
         assert_status_code(expected=HTTPStatus.CREATED, actual=response.status_code)
         task = CreateTaskResponseSchema.model_validate_json(response.content)
         task_ids_to_cleanup.append(task.id)
@@ -64,10 +61,8 @@ class TestTasks:
         tasks_client: TasksAPIClient,
         created_task: TaskFixture,
     ) -> None:
-        # Act
         response = tasks_client.get_task_api(task_id=created_task.task_id)
 
-        # Assert
         assert_status_code(expected=HTTPStatus.OK, actual=response.status_code)
         task = GetTaskResponseSchema.model_validate_json(response.content)
         assert_get_task_response(created_task.response, task)
@@ -78,13 +73,10 @@ class TestTasks:
         tasks_client: TasksAPIClient,
         created_task: TaskFixture,
     ) -> None:
-        # Arrange
         pagination = PaginationSchema(page=1, limit=10, total=1, pages=1)
 
-        # Act
         response = tasks_client.get_tasks_list_api()
 
-        # Assert
         assert_status_code(expected=HTTPStatus.OK, actual=response.status_code)
         tasks = GetTasksResponseSchema.model_validate_json(response.content)
         assert_get_tasks_response([created_task.response], pagination, tasks)
@@ -96,7 +88,6 @@ class TestTasks:
         created_task: TaskFixture,
         registered_user: UserFixture,
     ) -> None:
-        # Arrange
         assert_create_task_response(
             created_task.request, created_task.response, registered_user.user_id
         )
@@ -104,10 +95,8 @@ class TestTasks:
             title="Release checklist completed", status="done"
         )
 
-        # Act
         response = tasks_client.patch_task_api(task_id=created_task.task_id, body=body)
 
-        # Assert
         assert_status_code(expected=HTTPStatus.OK, actual=response.status_code)
         task = PatchTaskResponseSchema.model_validate_json(response.content)
         assert_patch_task_response(body, created_task.response, task)
@@ -122,10 +111,8 @@ class TestTasks:
         tasks_client: TasksAPIClient,
         created_task: TaskFixture,
     ) -> None:
-        # Act
         response = tasks_client.delete_task_api(task_id=created_task.task_id)
 
-        # Assert
         assert_status_code(expected=HTTPStatus.NO_CONTENT, actual=response.status_code)
         get_response = tasks_client.get_task_api(task_id=created_task.task_id)
         assert_status_code(
@@ -140,13 +127,10 @@ class TestTasks:
         task_ids_to_cleanup: list[UUID],
         title: str,
     ) -> None:
-        # Arrange
         body = CreateTaskRequestSchema(title=title)
 
-        # Act
         response = tasks_client.create_task_api(body=body)
 
-        # Assert
         assert_status_code(expected=HTTPStatus.CREATED, actual=response.status_code)
         task = CreateTaskResponseSchema.model_validate_json(response.content)
         task_ids_to_cleanup.append(task.id)
@@ -172,16 +156,13 @@ class TestTasks:
     def test_create_task_invalid_title_returns_422(
         self, tasks_client: TasksAPIClient, title: str, message: str, error_type: str
     ) -> None:
-        # Arrange
         body = CreateTaskRequestSchema.model_construct(title=title)
         details = [
             ErrorDetailSchema(loc=["body", "title"], msg=message, type=error_type)
         ]
 
-        # Act
         response = tasks_client.create_task_api(body=body)
 
-        # Assert
         assert_status_code(
             expected=HTTPStatus.UNPROCESSABLE_ENTITY, actual=response.status_code
         )
@@ -192,13 +173,10 @@ class TestTasks:
     def test_get_tasks_invalid_limit_returns_422(
         self, tasks_client: TasksAPIClient, limit: int
     ) -> None:
-        # Arrange
         params = GetTasksQueryParamsSchema.model_construct(limit=limit)
 
-        # Act
         response = tasks_client.get_tasks_list_api(params=params)
 
-        # Assert
         assert_status_code(
             expected=HTTPStatus.UNPROCESSABLE_ENTITY, actual=response.status_code
         )
@@ -213,7 +191,6 @@ class TestTasks:
         created_task: TaskFixture,
         second_user_tasks_client: TasksAPIClient,
     ) -> None:
-        # Arrange
         task_id = created_task.task_id
         expected_error = HttpErrorSchema(
             error=BaseErrorSchema(
@@ -221,13 +198,11 @@ class TestTasks:
             )
         )
 
-        # Act
         list_response = second_user_tasks_client.get_tasks_list_api()
         get_response = second_user_tasks_client.get_task_api(task_id=task_id)
         delete_response = second_user_tasks_client.delete_task_api(task_id=task_id)
         owner_response = tasks_client.get_task_api(task_id=task_id)
 
-        # Assert
         assert_status_code(expected=HTTPStatus.OK, actual=list_response.status_code)
         task_list = GetTasksResponseSchema.model_validate_json(list_response.content)
         assert task_list.items == []

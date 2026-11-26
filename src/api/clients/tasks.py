@@ -1,5 +1,6 @@
 from uuid import UUID
 
+import allure
 from httpx import Response
 
 from src.api.clients.auth import AuthAPIClient
@@ -16,6 +17,7 @@ from src.api.tools.routes import Route
 
 
 class TasksAPIClient(BaseAPIClient):
+    @allure.step("Отправка запроса на создание задачи")
     def create_task_api(self, body: CreateTaskRequestSchema) -> Response:
         return self.post(url=Route.TASKS, json=body.model_dump(mode="json"))
 
@@ -25,6 +27,7 @@ class TasksAPIClient(BaseAPIClient):
         response_data = CreateTaskResponseSchema.model_validate_json(response.content)
         return response_data
 
+    @allure.step("Отправка запроса на получение списка задач")
     def get_tasks_list_api(
         self, params: GetTasksQueryParamsSchema | None = None
     ) -> Response:
@@ -34,15 +37,18 @@ class TasksAPIClient(BaseAPIClient):
         else:
             return self.get(url=Route.TASKS)
 
+    @allure.step("Отправка запроса на получение задачи")
     def get_task_api(self, task_id: UUID) -> Response:
         return self.get(url=f"{Route.TASKS}/{task_id}")
 
+    @allure.step("Отправка запроса на обновление задачи")
     def patch_task_api(self, task_id: UUID, body: PatchTaskRequestSchema) -> Response:
         return self.patch(
             url=f"{Route.TASKS}/{task_id}",
             json=body.model_dump(mode="json", exclude_unset=True),
         )
 
+    @allure.step("Отправка запроса на удаление задачи")
     def delete_task_api(self, task_id: UUID) -> Response:
         return self.delete(url=f"{Route.TASKS}/{task_id}")
 

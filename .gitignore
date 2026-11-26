@@ -10,3 +10,7 @@ swagger-cache
 AGENTS.md
 .env
 .kilo
+allure-results/
+allure-report/
+test-results/
+.auth/
