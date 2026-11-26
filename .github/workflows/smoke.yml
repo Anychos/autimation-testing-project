@@ -141,7 +141,8 @@ jobs:
         if: always() && steps.deploy.outcome == 'success'
         env:
           PAGE_URL: ${{ steps.deploy.outputs.page_url }}
-        run: echo "[Allure report #${GITHUB_RUN_NUMBER}](${PAGE_URL}${GITHUB_RUN_NUMBER}/)" >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          echo "[Allure report #${GITHUB_RUN_NUMBER}](${PAGE_URL}${GITHUB_RUN_NUMBER}/)" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Show application logs on failure
         if: failure() && steps.application.outcome == 'success'
