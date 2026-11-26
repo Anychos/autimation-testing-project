@@ -167,7 +167,9 @@ class TestTasks:
             expected=HTTPStatus.UNPROCESSABLE_ENTITY, actual=response.status_code
         )
         error = HttpErrorSchema.model_validate_json(response.content)
-        assert_validation_error_response(error, details)
+        assert_validation_error_response(
+            actual_response=error, expected_details=details
+        )
 
     @pytest.mark.parametrize("limit", [0, 51], ids=["below-min", "above-max"])
     def test_get_tasks_invalid_limit_returns_422(
@@ -211,13 +213,17 @@ class TestTasks:
             expected=HTTPStatus.NOT_FOUND, actual=get_response.status_code
         )
         get_error = HttpErrorSchema.model_validate_json(get_response.content)
-        assert_http_error_response(get_error, expected_error)
+        assert_http_error_response(
+            actual_response=get_error, expected_response=expected_error
+        )
 
         assert_status_code(
             expected=HTTPStatus.NOT_FOUND, actual=delete_response.status_code
         )
         delete_error = HttpErrorSchema.model_validate_json(delete_response.content)
-        assert_http_error_response(delete_error, expected_error)
+        assert_http_error_response(
+            actual_response=delete_error, expected_response=expected_error
+        )
 
         assert_status_code(expected=HTTPStatus.OK, actual=owner_response.status_code)
         owner_task = GetTaskResponseSchema.model_validate_json(owner_response.content)

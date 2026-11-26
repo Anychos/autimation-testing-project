@@ -133,7 +133,7 @@ class TestAuth:
         ],
     )
     @allure.story(Story.REGISTRATION)
-    @allure.title("Регистрация пользователя с некорректными данными")
+    @allure.title("Регистрация пользователя с некорректными данными {param_id}")
     @allure.severity(Severity.MAJOR)
     def test_registration_incorrect_data_returns_422(
         self,
@@ -154,7 +154,9 @@ class TestAuth:
             actual=register_response.status_code,
         )
         response_data = HttpErrorSchema.model_validate_json(register_response.content)
-        assert_validation_error_response(response_data, expected_details)
+        assert_validation_error_response(
+            actual_response=response_data, expected_details=expected_details
+        )
 
     @allure.story(Story.REGISTRATION)
     @allure.title("Регистрация пользователя с зарегистрированным email")
@@ -177,7 +179,9 @@ class TestAuth:
             expected=HTTPStatus.CONFLICT, actual=register_response.status_code
         )
         response_data = HttpErrorSchema.model_validate_json(register_response.content)
-        assert_http_error_response(response_data, expected_error)
+        assert_http_error_response(
+            actual_response=response_data, expected_response=expected_error
+        )
 
     @allure.story(Story.LOGIN)
     @allure.title("Логин несуществующего пользователя")
@@ -198,7 +202,9 @@ class TestAuth:
             expected=HTTPStatus.UNAUTHORIZED, actual=login_response.status_code
         )
         response_data = HttpErrorSchema.model_validate_json(login_response.content)
-        assert_http_error_response(response_data, expected_error)
+        assert_http_error_response(
+            actual_response=response_data, expected_response=expected_error
+        )
 
     @allure.story(Story.LOGIN)
     @allure.title("Логин пользователя с некорректным паролем")
@@ -219,4 +225,6 @@ class TestAuth:
             expected=HTTPStatus.UNAUTHORIZED, actual=login_response.status_code
         )
         response_data = HttpErrorSchema.model_validate_json(login_response.content)
-        assert_http_error_response(response_data, expected_error)
+        assert_http_error_response(
+            actual_response=response_data, expected_response=expected_error
+        )
