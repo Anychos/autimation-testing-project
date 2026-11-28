@@ -1,0 +1,8 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","8","test_patch_task_returns_updated_task","tests.api","2026-11-26","passed","2026-11-26","TestTasks","test_tasks","",""
+"","3","test_get_task_returns_created_task","tests.api","2026-11-26","passed","2026-11-26","TestTasks","test_tasks","",""
+"","8","test_delete_task_returns_204","tests.api","2026-11-26","passed","2026-11-26","TestTasks","test_tasks","",""
+"","58","Регистрация пользователя","tests.api","2026-11-26","passed","2026-11-26","TestAuth","test_auth","",""
+"","6","test_get_tasks_returns_created_task","tests.api","2026-11-26","passed","2026-11-26","TestTasks","test_tasks","",""
+"","6","test_create_task_returns_201","tests.api","2026-11-26","passed","2026-11-26","TestTasks","test_tasks","",""
+"","62","Логин пользователя","tests.api","2026-11-26","passed","2026-11-26","TestAuth","test_auth","",""
