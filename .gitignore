@@ -1,6 +1,5 @@
 __pycache__
 .agents
-.clinerules
 .pytest_cache
 .ruff_cache
 .venv
@@ -9,8 +8,13 @@ logs
 swagger-cache
 AGENTS.md
 .env
-.kilo
 allure-results/
 allure-report/
 test-results/
 .auth/
+coverage-results/
+coverage-report/
+swagger-coverage-history.json
+swagger-coverage-report.html
+swagger-coverage-report.json
+questions-qa.md

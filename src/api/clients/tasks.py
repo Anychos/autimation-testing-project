@@ -13,11 +13,13 @@ from src.api.schemas.tasks import (
     GetTasksQueryParamsSchema,
     PatchTaskRequestSchema,
 )
+from src.api.tools.coverage import coverage_tracker
 from src.api.tools.routes import Route
 
 
 class TasksAPIClient(BaseAPIClient):
     @allure.step("Отправка запроса на создание задачи")
+    @coverage_tracker.track_coverage_httpx(Route.TASKS)
     def create_task_api(self, body: CreateTaskRequestSchema) -> Response:
         return self.post(url=Route.TASKS, json=body.model_dump(mode="json"))
 
@@ -28,6 +30,7 @@ class TasksAPIClient(BaseAPIClient):
         return response_data
 
     @allure.step("Отправка запроса на получение списка задач")
+    @coverage_tracker.track_coverage_httpx(Route.TASKS)
     def get_tasks_list_api(
         self, params: GetTasksQueryParamsSchema | None = None
     ) -> Response:
@@ -38,10 +41,12 @@ class TasksAPIClient(BaseAPIClient):
             return self.get(url=Route.TASKS)
 
     @allure.step("Отправка запроса на получение задачи")
+    @coverage_tracker.track_coverage_httpx("/api/v1/tasks/{id}")
     def get_task_api(self, task_id: UUID) -> Response:
         return self.get(url=f"{Route.TASKS}/{task_id}")
 
     @allure.step("Отправка запроса на обновление задачи")
+    @coverage_tracker.track_coverage_httpx("/api/v1/tasks/{id}")
     def patch_task_api(self, task_id: UUID, body: PatchTaskRequestSchema) -> Response:
         return self.patch(
             url=f"{Route.TASKS}/{task_id}",
@@ -49,6 +54,7 @@ class TasksAPIClient(BaseAPIClient):
         )
 
     @allure.step("Отправка запроса на удаление задачи")
+    @coverage_tracker.track_coverage_httpx("/api/v1/tasks/{id}")
     def delete_task_api(self, task_id: UUID) -> Response:
         return self.delete(url=f"{Route.TASKS}/{task_id}")
 

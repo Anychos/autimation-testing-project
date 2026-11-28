@@ -1,33 +1,19 @@
-from playwright.sync_api import Locator, Page
+from playwright.sync_api import Locator, Page, expect
 
 from src.ui.components.base import BaseComponent
 
 
 class BaseForm(BaseComponent):
-    def __init__(self, page: Page, form_box: str) -> None:
+    def __init__(self, page: Page, form_box: Locator) -> None:
         super().__init__(page)
+        self.form_box = form_box
 
-        self.form_box = self.page.locator(f"div.{form_box}")
         self.form_title = self.form_box.get_by_role(role="heading")
         self.title_subtext = self.form_box.locator("p.muted")
-
-    def field_label(self, field_name: str) -> Locator:
-        return self.form_box.locator(f"label[for='{field_name}']")
-
-    def input(self, test_id: str) -> Locator:
-        return self.form_box.get_by_test_id(test_id)
-
-    def button(self, test_id: str) -> Locator:
-        return self.form_box.get_by_test_id(test_id)
 
     def error_message(self, field_name: str) -> Locator:
         return self.form_box.locator(f"span[id='{field_name}-error']")
 
-    def fill_field(self, field_test_id: str, value: str) -> None:
-        self.input(field_test_id).fill(value)
-
-    def clear_field(self, field_test_id: str) -> None:
-        self.input(field_test_id).clear()
-
-    def click_button(self, button_test_id: str) -> None:
-        self.button(button_test_id).click()
+    def check_field_error(self, field_name: str, message: str) -> None:
+        expect(self.error_message(field_name)).to_be_visible()
+        expect(self.error_message(field_name)).to_contain_text(message)

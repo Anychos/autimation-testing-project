@@ -41,6 +41,20 @@ Copy-Item .env.example .env
 
 В `.env` тестового проекта по умолчанию указаны адрес API `http://localhost:8000` и таймаут 10 секунд. При необходимости измените `HTTP_CLIENT.BASE_URL` и `HTTP_CLIENT.TIMEOUT`.
 
+UI-тесты по умолчанию открывают `http://localhost:5173`. Для другого адреса frontend передайте `--base-url`, например `--base-url=http://localhost:15173`. Используйте одинаковое имя хоста для frontend и API, чтобы браузер получил cookie авторизации.
+
+## Покрытие OpenAPI
+
+Swagger Coverage Tool собирает данные запросов API-клиентов. Для отчёта запустите тестовое приложение с OpenAPI по адресу из `swagger_coverage_config.yaml`, затем выполните из корня проекта:
+
+```powershell
+.\.venv\Scripts\swagger-coverage-tool.exe clear-results
+.\.venv\Scripts\python.exe -m pytest tests/api
+.\.venv\Scripts\swagger-coverage-tool.exe save-report
+```
+
+Откройте `swagger-coverage-report.html` в браузере. Машиночитаемый отчёт сохраняется в `swagger-coverage-report.json`, история — в `swagger-coverage-history.json`. `clear-results` удаляет JSON-файлы из `coverage-results`, чтобы отчёт содержал результаты текущего запуска. Подготовительные запросы и очистка через API-клиенты также учитываются. Для другого адреса API измените `swagger_url` в конфигурации или задайте путь к отдельной конфигурации через `SWAGGER_COVERAGE_CONFIG_FILE_YAML`.
+
 ## Запуск тестов
 
 Команды выполняются из корня тестового проекта при запущенном backend:

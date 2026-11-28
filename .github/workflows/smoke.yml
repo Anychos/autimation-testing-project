@@ -1,4 +1,4 @@
-name: Smoke tests
+name: Смоук-тесты
 
 on:
   push:
@@ -22,39 +22,39 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url || steps.deploy_retry.outputs.page_url }}
     steps:
-      - name: Check out tests
+      - name: Получение кода тестов
         uses: actions/checkout@v4
 
-      - name: Check out application
+      - name: Получение кода приложения
         id: application
         uses: actions/checkout@v4
         with:
           repository: Anychos/autimation-testing-project-app
           path: application
 
-      - name: Set up Python
+      - name: Настройка Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: pip
 
-      - name: Install test dependencies
+      - name: Установка зависимостей тестов
         run: python -m pip install -r requirements.txt
 
-      - name: Start application
+      - name: Запуск приложения
         working-directory: application
         run: |
           cp .env.example .env
           docker compose -p smoke-ci up -d --build --wait --wait-timeout 120 backend
 
-      - name: Run tests
+      - name: Запуск тестов
         id: tests
         env:
           HTTP_CLIENT.BASE_URL: http://localhost:8000
           HTTP_CLIENT.TIMEOUT: '10'
-        run: python -m pytest
+        run: python -m pytest tests/api
 
-      - name: Check for Allure results
+      - name: Проверка наличия результатов Allure
         id: results
         if: always() && steps.tests.outcome != 'skipped'
         run: |
@@ -62,7 +62,7 @@ jobs:
             echo "available=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check whether report history exists
+      - name: Проверка наличия истории отчётов
         if: always() && steps.results.outputs.available == 'true'
         id: history_branch
         run: |
@@ -73,7 +73,7 @@ jobs:
             exit "$status"
           fi
 
-      - name: Check out report history
+      - name: Получение истории отчётов
         if: always() && steps.history_branch.outcome == 'success' && steps.history_branch.outputs.exists == 'true'
         id: checkout_history
         uses: actions/checkout@v4
@@ -81,12 +81,12 @@ jobs:
           ref: gh-pages
           path: gh-pages
 
-      - name: Remove Git metadata from report history
+      - name: Удаление метаданных Git из истории отчётов
         if: always() && steps.checkout_history.outcome == 'success'
         id: clean_history
         run: rm -rf gh-pages/.git
 
-      - name: Generate Allure report
+      - name: Формирование отчёта Allure
         if: always() && steps.history_branch.outcome == 'success' && (steps.history_branch.outputs.exists != 'true' || steps.clean_history.outcome == 'success')
         id: report
         env:
@@ -109,13 +109,13 @@ jobs:
             rm -rf "allure-history/$old_report"
           done
 
-      - name: Set latest report as the home page
+      - name: Назначение последнего отчёта главной страницей
         if: always() && steps.report.outcome == 'success'
         id: homepage
         run: |
           printf '<!doctype html><meta http-equiv="refresh" content="0; url=%s/">\n<a href="%s/">Latest Allure report</a>\n' "$GITHUB_RUN_NUMBER" "$GITHUB_RUN_NUMBER" > allure-history/index.html
 
-      - name: Save report history
+      - name: Сохранение истории отчётов
         if: always() && steps.homepage.outcome == 'success'
         id: history
         uses: peaceiris/actions-gh-pages@v4
@@ -125,41 +125,41 @@ jobs:
           publish_dir: allure-history
           force_orphan: true
 
-      - name: Upload Pages artifact
+      - name: Загрузка артефакта Pages
         if: always() && steps.history.outcome == 'success'
         id: upload
         uses: actions/upload-pages-artifact@v3
         with:
           path: allure-history
 
-      - name: Deploy report to GitHub Pages
+      - name: Публикация отчёта в GitHub Pages
         if: always() && steps.upload.outcome == 'success'
         id: deploy
         continue-on-error: true
         uses: actions/deploy-pages@v4
 
-      - name: Wait before retrying deployment
+      - name: Ожидание перед повторной публикацией
         if: always() && steps.deploy.outcome == 'failure'
         run: sleep 15
 
-      - name: Retry report deployment
+      - name: Повторная публикация отчёта
         if: always() && steps.deploy.outcome == 'failure'
         id: deploy_retry
         uses: actions/deploy-pages@v4
 
-      - name: Add report link to summary
+      - name: Добавление ссылки на отчёт в сводку
         if: always() && (steps.deploy.outcome == 'success' || steps.deploy_retry.outcome == 'success')
         env:
           PAGE_URL: ${{ steps.deploy.outputs.page_url || steps.deploy_retry.outputs.page_url }}
         run: |
           echo "[Allure report #${GITHUB_RUN_NUMBER}](${PAGE_URL}${GITHUB_RUN_NUMBER}/)" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Show application logs on failure
+      - name: Просмотр логов приложения при ошибке
         if: failure() && steps.application.outcome == 'success'
         working-directory: application
         run: docker compose -p smoke-ci logs --no-color
 
-      - name: Stop application
+      - name: Остановка приложения
         if: always() && steps.application.outcome == 'success'
         working-directory: application
         run: docker compose -p smoke-ci down --volumes

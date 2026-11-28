@@ -8,7 +8,7 @@ class HttpClientSettings(BaseModel):
 
     @property
     def url(self) -> str:
-        return str(self.base_url)
+        return str(self.base_url).rstrip("/")
 
 
 class Settings(BaseSettings):

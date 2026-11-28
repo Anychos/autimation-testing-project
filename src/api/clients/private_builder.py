@@ -17,7 +17,7 @@ def private_client_builder(
         base_url=settings.http_client.url,
         timeout=settings.http_client.timeout,
         cookies=login_response.cookies,
-        headers={"Origin": settings.http_client.url.rstrip("/")},
+        headers={"Origin": settings.http_client.url},
     )
 
     try:

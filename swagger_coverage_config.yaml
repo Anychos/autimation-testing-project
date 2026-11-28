@@ -1,0 +1,8 @@
+services:
+  - key: taskflow
+    name: TaskFlow API
+    swagger_url: http://localhost:8000/openapi.json
+results_dir: ./coverage-results
+history_file: ./swagger-coverage-history.json
+html_report_file: ./swagger-coverage-report.html
+json_report_file: ./swagger-coverage-report.json

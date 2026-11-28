@@ -10,3 +10,4 @@ pydantic[email]
 httpx
 pydantic_settings
 allure-pytest
+swagger-coverage-tool==0.34.0

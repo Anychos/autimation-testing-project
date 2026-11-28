@@ -9,11 +9,13 @@ from src.api.schemas.auth import (
     RegisterRequestSchema,
     RegisterResponseSchema,
 )
+from src.api.tools.coverage import coverage_tracker
 from src.api.tools.routes import Route
 
 
 class AuthAPIClient(BaseAPIClient):
     @allure.step("Отправка запроса на регистрацию")
+    @coverage_tracker.track_coverage_httpx(Route.REGISTER)
     def register_api(self, *, body: RegisterRequestSchema) -> Response:
         return self.post(url=Route.REGISTER, json=body.model_dump(mode="json"))
 
@@ -24,6 +26,7 @@ class AuthAPIClient(BaseAPIClient):
         return response_data
 
     @allure.step("Отправка запроса на логин")
+    @coverage_tracker.track_coverage_httpx(Route.LOGIN)
     def login_api(self, *, body: LoginRequestSchema) -> Response:
         return self.post(url=Route.LOGIN, json=body.model_dump(mode="json"))
 
@@ -34,6 +37,7 @@ class AuthAPIClient(BaseAPIClient):
         return response_data
 
     @allure.step("Отправка запроса на получение данных текущего пользователя")
+    @coverage_tracker.track_coverage_httpx(Route.GET_USER_ME)
     def get_user_me_api(self) -> Response:
         return self.get(url=Route.GET_USER_ME)
 
